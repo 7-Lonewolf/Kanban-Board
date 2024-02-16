@@ -80,7 +80,7 @@
     position: absolute;
     top: 30%;
     left: 25%;
-    display: flex;
+    display: none;
     /* position: absolute; -- no need as of now */
 }
 
@@ -129,4 +129,8 @@
     flex-wrap: wrap;
     gap: 2rem;
 
+}
+
+.active{
+    border: 5px solid lightsalmon;
 }
