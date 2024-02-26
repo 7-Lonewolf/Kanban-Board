@@ -121,6 +121,13 @@
     background-color: yellow;
 }
 
+.ticket-lock{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 100px;
+    margin-right: 5px;
+}
+
 .main-cont{
     padding: 2rem;
     display: flex;
