@@ -5,12 +5,15 @@ let modalPriorityColor = 'lightpink'
 let textAreaCont = document.querySelector('.textArea-cont')
 let mainCont = document.querySelector('.main-cont')
 let removeBtn = document.querySelector('.delete-btn')
+let toolboxColors = document.querySelectorAll('.color')
 
 let addTaskFlag = false;
 let removeTaskFlag = false;
 let lockIconClass = 'fa-lock'
 let unlockIconClass = 'fa-lock-open'
 let colors = ['lightpink', 'lightgreen', 'lightblue', 'black']
+let ticketArray = []  // --> To store vital info of all tickets
+
 
 
 addBtn.addEventListener('click', function(event){
@@ -49,7 +52,7 @@ modalCont.addEventListener('keydown', event => {
         // Create Ticket else no action required
         let ticketDesc = textAreaCont.value
         let ticketId = shortid()
-        createTicket(modalPriorityColor,ticketId, ticketDesc)
+        createTicket(modalPriorityColor, ticketId, ticketDesc)
 
         // close modal once textArea is filled and shift is pressed 
         modalCont.style.display = 'none'
@@ -63,7 +66,7 @@ modalCont.addEventListener('keydown', event => {
     }
 })
 
-function createTicket (ticketColor, ticketId, ticketDesc){
+function createTicket(ticketColor, ticketId, ticketDesc){
     // Dynamically Creating the ticket container and Divs
     let ticketCont = document.createElement('div')
 
@@ -73,6 +76,29 @@ function createTicket (ticketColor, ticketId, ticketDesc){
 
     mainCont.appendChild(ticketCont);
 
+    // maintaining a ticket data
+    // Creating an object
+
+    // let ticketMetadata = {
+    //     "ticketColor": ticketColor,
+    //     "ticketId": ticketId,                    //Old method of creating Objects 
+    //     "ticketDesc": ticketDesc
+    // }
+
+    let ticketMetadata = {
+        ticketColor,
+        ticketId,                                  // Alternate method of creating objects  
+        ticketDesc
+    }
+
+    
+    //***  If freshly creeated tickets
+    //Only then push the tickets
+    //otherwise, dont push (case of duplicate tickets)
+    // if (!ticketId){
+        ticketArray.push(ticketMetadata) // To keep updating the ticketArray and keeping a list for further use
+    // }
+    
     handleRemove(ticketCont)
 
     handleLock(ticketCont)
@@ -103,6 +129,13 @@ function handleRemove(ticket){
             //remove ticket 
             // ticket.style.display = 'none'  -->  This will not delete the div from the HTML file but will just stop diplaying
             ticket.remove();
+
+            //updating ticketArray state with newly edited text
+
+
+
+
+
         }else {
             // do nothing
         }
@@ -132,6 +165,15 @@ function handleLock(ticket){
             //make the ticket uneditable 
             taskArea.setAttribute('contenteditable', 'false')
         }
+
+        //updating ticketArray state with newly edited text
+        let ticketId = ticket.children[1].innerText
+
+        ticketArray.forEach( t => {
+            if (t.ticketId == ticketId){
+                t.ticketDesc = taskArea.innerText
+            }
+        })
     })
 }
 
@@ -154,5 +196,52 @@ function handleColor(ticket){
         ticketColorBand.classList.remove(currentColor)
         // add new color
         ticketColorBand.classList.add(newColor)
+
+        //updating ticketArray state with newly edited color
+
+        // let ticketId = ticket.children[1].innerText
+
+        ticketArray.forEach(t => {
+            if (t.ticketId == ticketId){
+                t.ticketColor = newColor
+            }
+        })
     })
 }
+
+//implementing filter 
+// color based already done - Using a array based approach to recreate the selection and operate upon
+
+toolboxColors.forEach(toolboxColor => {
+    toolboxColor.addEventListener('click', () => {
+        let selectedToolboxColor = toolboxColor.classList[0]
+
+        let filteredTickets = ticketArray.filter(ticket => {
+            return selectedToolboxColor == ticket.ticketColor
+        })
+
+        //remove all tickets
+        let allTickets = document.querySelectorAll('.ticket-cont')
+        allTickets.forEach(ticket => {
+            ticket.remove();
+        })
+
+        //recreate tickets within filtered array
+
+        filteredTickets.forEach(filteredTicket => {
+            createTicket(filteredTicket.ticketColor, filteredTicket.ticketId, filteredTicket.ticketDesc)
+        })
+    })
+
+    toolboxColor.addEventListener('dblclick', () => {
+        // remove all tickets from DOM 
+        let allTickets = document.querySelectorAll('.ticket-cont')
+        allTickets.forEach(ticket => {
+            ticket.remove();
+        })
+        // create all tickets from ticket Array
+        ticketArray.forEach(ticket => {
+            createTicket(ticket.ticketColor, ticket.ticketId, ticket.ticketDesc)
+        })
+    })
+})
