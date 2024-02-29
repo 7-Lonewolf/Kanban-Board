@@ -52,7 +52,7 @@ modalCont.addEventListener('keydown', event => {
         // Create Ticket else no action required
         let ticketDesc = textAreaCont.value
         let ticketId = shortid()
-        createTicket(modalPriorityColor, ticketId, ticketDesc)
+        createTicket(modalPriorityColor, ticketDesc)
 
         // close modal once textArea is filled and shift is pressed 
         modalCont.style.display = 'none'
@@ -66,13 +66,15 @@ modalCont.addEventListener('keydown', event => {
     }
 })
 
-function createTicket(ticketColor, ticketId, ticketDesc){
+function createTicket(ticketColor, ticketDesc, ticketId){
     // Dynamically Creating the ticket container and Divs
-    let ticketCont = document.createElement('div')
+    let id = ticketId || shortid()
 
+    let ticketCont = document.createElement('div')
+    
     ticketCont.classList.add('ticket-cont')
 
-    ticketCont.innerHTML = `<div class="ticket-color ${ticketColor}" ></div><div class="ticket-id">${ticketId}</div><div class="task-area">${ticketDesc}</div></div><div class="ticket-lock"><i class="fa-solid fa-lock"></i></div>`
+    ticketCont.innerHTML = `<div class="ticket-color ${ticketColor}" ></div><div class="ticket-id">${id}</div><div class="task-area">${ticketDesc}</div></div><div class="ticket-lock"><i class="fa-solid fa-lock"></i></div>`
 
     mainCont.appendChild(ticketCont);
 
@@ -87,7 +89,7 @@ function createTicket(ticketColor, ticketId, ticketDesc){
 
     let ticketMetadata = {
         ticketColor,
-        ticketId,                                  // Alternate method of creating objects  
+        ticketId: id,                                  // Alternate method of creating objects  
         ticketDesc
     }
 
@@ -95,9 +97,9 @@ function createTicket(ticketColor, ticketId, ticketDesc){
     //***  If freshly creeated tickets
     //Only then push the tickets
     //otherwise, dont push (case of duplicate tickets)
-    // if (!ticketId){
+    if (!ticketId){
         ticketArray.push(ticketMetadata) // To keep updating the ticketArray and keeping a list for further use
-    // }
+    }
     
     handleRemove(ticketCont)
 
@@ -122,19 +124,21 @@ removeBtn.addEventListener('click', (event) => {
 })
 
 
-//handling lock mechanism    
+//Adding Remove Feature   
 function handleRemove(ticket){
     ticket.addEventListener('click', event =>{
-        if (removeTaskFlag == true){
-            //remove ticket 
+        if (removeTaskFlag){    // same as ---> (removeTaskFlag == true)
+            
+            //removing to be deleted ticket from ticketArray first
+            let ticketId = ticket.children[1].innerText
+            let ticketIndex = ticketArray.findIndex(t =>{
+                return t.ticketId == ticketId
+            })
+            ticketArray.splice(ticketIndex, 1)
+
+            //remove ticket - ui removal
             // ticket.style.display = 'none'  -->  This will not delete the div from the HTML file but will just stop diplaying
             ticket.remove();
-
-            //updating ticketArray state with newly edited text
-
-
-
-
 
         }else {
             // do nothing
@@ -142,6 +146,7 @@ function handleRemove(ticket){
     })
 }
 
+//Lock and unlock feature
 function handleLock(ticket){
     let ticketLockEle = ticket.querySelector('.ticket-lock')
 
