@@ -138,6 +138,25 @@
 
 }
 
+.reset-cont{
+    height: 3rem;
+    width: 3rem;
+    background-color: #3d3d3d;
+    color: white;
+    margin-left: 58rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.reset-cont:hover{
+    background-color:#4BB543 ;
+}
+
+.reset-cont > * {
+    font-size: 2rem;
+}
+
 .active{
     border: 5px solid lightsalmon;
 }

@@ -6,6 +6,7 @@ let textAreaCont = document.querySelector('.textArea-cont')
 let mainCont = document.querySelector('.main-cont')
 let removeBtn = document.querySelector('.delete-btn')
 let toolboxColors = document.querySelectorAll('.color')
+let refreshBtn = document.querySelector('.reset-cont')
 
 let addTaskFlag = false;
 let removeTaskFlag = false;
@@ -71,7 +72,7 @@ function createTicket(ticketColor, ticketDesc, ticketId){
     let id = ticketId || shortid()
 
     let ticketCont = document.createElement('div')
-    
+
     ticketCont.classList.add('ticket-cont')
 
     ticketCont.innerHTML = `<div class="ticket-color ${ticketColor}" ></div><div class="ticket-id">${id}</div><div class="task-area">${ticketDesc}</div></div><div class="ticket-lock"><i class="fa-solid fa-lock"></i></div>`
@@ -99,6 +100,8 @@ function createTicket(ticketColor, ticketDesc, ticketId){
     //otherwise, dont push (case of duplicate tickets)
     if (!ticketId){
         ticketArray.push(ticketMetadata) // To keep updating the ticketArray and keeping a list for further use
+        // Updating local storage simultaneously 
+        localStorage.setItem('ticket', JSON.stringify(ticketArray))
     }
     
     handleRemove(ticketCont)
@@ -135,6 +138,9 @@ function handleRemove(ticket){
                 return t.ticketId == ticketId
             })
             ticketArray.splice(ticketIndex, 1)
+
+            //update local storage
+            localStorage.setItem('ticket', JSON.stringify(ticketArray))  // Converts Array to strings
 
             //remove ticket - ui removal
             // ticket.style.display = 'none'  -->  This will not delete the div from the HTML file but will just stop diplaying
@@ -179,6 +185,9 @@ function handleLock(ticket){
                 t.ticketDesc = taskArea.innerText
             }
         })
+
+        // updating local storage
+        localStorage.setItem('ticket', JSON.stringify(ticketArray))
     })
 }
 
@@ -211,6 +220,9 @@ function handleColor(ticket){
                 t.ticketColor = newColor
             }
         })
+
+        //updating local storage
+        localStorage.setItem('ticket', JSON.stringify(ticketArray))
     })
 }
 
@@ -234,7 +246,7 @@ toolboxColors.forEach(toolboxColor => {
         //recreate tickets within filtered array
 
         filteredTickets.forEach(filteredTicket => {
-            createTicket(filteredTicket.ticketColor, filteredTicket.ticketId, filteredTicket.ticketDesc)
+            createTicket(filteredTicket.ticketColor, filteredTicket.ticketDesc, filteredTicket.ticketId)
         })
     })
 
@@ -246,7 +258,33 @@ toolboxColors.forEach(toolboxColor => {
         })
         // create all tickets from ticket Array
         ticketArray.forEach(ticket => {
-            createTicket(ticket.ticketColor, ticket.ticketId, ticket.ticketDesc)
+            createTicket(ticket.ticketColor, ticket.ticketDesc, ticket.ticketId)
         })
     })
 })
+
+
+//re-setting the local storage - TOTAL REFRESH
+refreshBtn.addEventListener('click', () => {
+    //clear local storage
+    localStorage.clear();
+ 
+    //remove all tickets
+    let allTickets = document.querySelectorAll('.ticket-cont')
+    allTickets.forEach(ticket => {
+        ticket.remove();
+    })
+
+    //reset the ticket array 
+    ticketArray = [];
+})
+
+
+//local storage
+let ticketsLocalStorage = localStorage.getItem('ticket')
+if(ticketsLocalStorage){
+    ticketArray = JSON.parse(ticketsLocalStorage) //Translates key value pair into Array 
+    ticketArray.forEach(ticket =>{
+        createTicket(ticket.ticketColor, ticket.ticketDesc, ticket.ticketId)
+    })
+}
