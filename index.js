@@ -213,7 +213,7 @@ function handleColor(ticket){
 
         //updating ticketArray state with newly edited color
 
-        // let ticketId = ticket.children[1].innerText
+        let ticketId = ticket.children[1].innerText
 
         ticketArray.forEach(t => {
             if (t.ticketId == ticketId){
@@ -262,6 +262,12 @@ toolboxColors.forEach(toolboxColor => {
         })
     })
 })
+
+// Refresh Btn Warning
+
+// refreshBtn.addEventListener('mouseover', () =>{
+//     alert("Click to reset the page")
+// })
 
 
 //re-setting the local storage - TOTAL REFRESH
